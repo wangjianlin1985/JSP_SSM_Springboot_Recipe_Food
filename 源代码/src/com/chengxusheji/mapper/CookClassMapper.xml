@@ -1,0 +1,48 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.CookClassMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加烹饪分类记录 -->
+	<insert id="addCookClass" parameterType="cookClass">
+		insert into t_cookClass(className,cookClassDesc) values 
+		(#{className},#{cookClassDesc})
+	</insert>
+
+	<!-- 按照查询条件分页查询烹饪分类记录 -->
+	<select id="queryCookClass" resultMap="cookClassMap" >
+		select t_cookClass.* from t_cookClass ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="cookClassMap" type="cookClass">
+        <id property="cookClassId" column="cookClassId" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有烹饪分类记录 -->
+	<select id="queryCookClassList" resultMap="cookClassMap" >
+		select t_cookClass.* from t_cookClass ${where}
+	</select>
+
+    <!-- 按照查询条件的烹饪分类记录数 -->
+	<select id="queryCookClassCount" resultType="int">
+		select count(*) from t_cookClass ${where}
+	</select>
+
+	<!-- 根据主键查询某个烹饪分类记录 -->
+	<select id="getCookClass" parameterType="int" resultMap="cookClassMap">
+		select * from t_cookClass where t_cookClass.cookClassId = #{cookClassId}
+	</select>
+
+	<!-- 更新烹饪分类记录 -->
+	<update id="updateCookClass" parameterType="cookClass">
+		update t_cookClass set className=#{className},cookClassDesc=#{cookClassDesc} where cookClassId = #{cookClassId}
+	</update>
+
+	<!-- 删除烹饪分类记录 -->
+	<delete id="deleteCookClass" parameterType="int">
+		delete from t_cookClass where cookClassId=#{cookClassId}
+	</delete>
+
+</mapper>

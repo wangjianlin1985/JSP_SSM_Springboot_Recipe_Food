@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.CookingMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加烹饪菜谱记录 -->
+	<insert id="addCooking" parameterType="cooking">
+		insert into t_cooking(cookClassObj,cookingName,cookingPhoto,gongxiao,cookingDesc,yongliao,videoFile,addTime) values 
+		(#{cookClassObj.cookClassId},#{cookingName},#{cookingPhoto},#{gongxiao},#{cookingDesc},#{yongliao},#{videoFile},#{addTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询烹饪菜谱记录 -->
+	<select id="queryCooking" resultMap="cookingMap" >
+		select t_cooking.* from t_cooking,t_cookClass ${where} and t_cooking.cookClassObj = t_cookClass.cookClassId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="cookingMap" type="cooking">
+        <id property="cookingId" column="cookingId" />
+        <association property="cookClassObj" column="cookClassObj" select="com.chengxusheji.mapper.CookClassMapper.getCookClass" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有烹饪菜谱记录 -->
+	<select id="queryCookingList" resultMap="cookingMap" >
+		select t_cooking.* from t_cooking,t_cookClass ${where} and t_cooking.cookClassObj = t_cookClass.cookClassId
+	</select>
+
+    <!-- 按照查询条件的烹饪菜谱记录数 -->
+	<select id="queryCookingCount" resultType="int">
+		select count(*) from t_cooking,t_cookClass ${where} and t_cooking.cookClassObj = t_cookClass.cookClassId
+	</select>
+
+	<!-- 根据主键查询某个烹饪菜谱记录 -->
+	<select id="getCooking" parameterType="int" resultMap="cookingMap">
+		select * from t_cooking where t_cooking.cookingId = #{cookingId}
+	</select>
+
+	<!-- 更新烹饪菜谱记录 -->
+	<update id="updateCooking" parameterType="cooking">
+		update t_cooking set cookClassObj=#{cookClassObj.cookClassId},cookingName=#{cookingName},cookingPhoto=#{cookingPhoto},gongxiao=#{gongxiao},cookingDesc=#{cookingDesc},yongliao=#{yongliao},videoFile=#{videoFile},addTime=#{addTime} where cookingId = #{cookingId}
+	</update>
+
+	<!-- 删除烹饪菜谱记录 -->
+	<delete id="deleteCooking" parameterType="int">
+		delete from t_cooking where cookingId=#{cookingId}
+	</delete>
+
+</mapper>

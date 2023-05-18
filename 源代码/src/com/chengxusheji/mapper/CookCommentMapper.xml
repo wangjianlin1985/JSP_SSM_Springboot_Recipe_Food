@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.CookCommentMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加评论记录 -->
+	<insert id="addCookComment" parameterType="cookComment">
+		insert into t_cookComment(cookingObj,content,userObj,commentTime) values 
+		(#{cookingObj.cookingId},#{content},#{userObj.user_name},#{commentTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询评论记录 -->
+	<select id="queryCookComment" resultMap="cookCommentMap" >
+		select t_cookComment.* from t_cookComment,t_cooking,t_userInfo ${where} and t_cookComment.cookingObj = t_cooking.cookingId and t_cookComment.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="cookCommentMap" type="cookComment">
+        <id property="commentId" column="commentId" />
+        <association property="cookingObj" column="cookingObj" select="com.chengxusheji.mapper.CookingMapper.getCooking" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有评论记录 -->
+	<select id="queryCookCommentList" resultMap="cookCommentMap" >
+		select t_cookComment.* from t_cookComment,t_cooking,t_userInfo ${where} and t_cookComment.cookingObj = t_cooking.cookingId and t_cookComment.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的评论记录数 -->
+	<select id="queryCookCommentCount" resultType="int">
+		select count(*) from t_cookComment,t_cooking,t_userInfo ${where} and t_cookComment.cookingObj = t_cooking.cookingId and t_cookComment.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个评论记录 -->
+	<select id="getCookComment" parameterType="int" resultMap="cookCommentMap">
+		select * from t_cookComment where t_cookComment.commentId = #{commentId}
+	</select>
+
+	<!-- 更新评论记录 -->
+	<update id="updateCookComment" parameterType="cookComment">
+		update t_cookComment set cookingObj=#{cookingObj.cookingId},content=#{content},userObj=#{userObj.user_name},commentTime=#{commentTime} where commentId = #{commentId}
+	</update>
+
+	<!-- 删除评论记录 -->
+	<delete id="deleteCookComment" parameterType="int">
+		delete from t_cookComment where commentId=#{commentId}
+	</delete>
+
+</mapper>

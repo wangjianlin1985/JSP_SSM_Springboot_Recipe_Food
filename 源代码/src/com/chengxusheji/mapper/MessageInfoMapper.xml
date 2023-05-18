@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.MessageInfoMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加用户消息记录 -->
+	<insert id="addMessageInfo" parameterType="messageInfo">
+		insert into t_messageInfo(content,sender,reciever,sendTime,readState) values 
+		(#{content},#{sender.user_name},#{reciever.user_name},#{sendTime},#{readState})
+	</insert>
+
+	<!-- 按照查询条件分页查询用户消息记录 -->
+	<select id="queryMessageInfo" resultMap="messageInfoMap" >
+		select t_messageInfo.* from t_messageInfo ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="messageInfoMap" type="messageInfo">
+        <id property="messageId" column="messageId" />
+        <association property="sender" column="sender" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+        <association property="reciever" column="reciever" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有用户消息记录 -->
+	<select id="queryMessageInfoList" resultMap="messageInfoMap" >
+		select t_messageInfo.* from t_messageInfo ${where}
+	</select>
+
+    <!-- 按照查询条件的用户消息记录数 -->
+	<select id="queryMessageInfoCount" resultType="int">
+		select count(*) from t_messageInfo ${where}
+	</select>
+
+	<!-- 根据主键查询某个用户消息记录 -->
+	<select id="getMessageInfo" parameterType="int" resultMap="messageInfoMap">
+		select * from t_messageInfo where t_messageInfo.messageId = #{messageId}
+	</select>
+
+	<!-- 更新用户消息记录 -->
+	<update id="updateMessageInfo" parameterType="messageInfo">
+		update t_messageInfo set content=#{content},sender=#{sender.user_name},reciever=#{reciever.user_name},sendTime=#{sendTime},readState=#{readState} where messageId = #{messageId}
+	</update>
+
+	<!-- 删除用户消息记录 -->
+	<delete id="deleteMessageInfo" parameterType="int">
+		delete from t_messageInfo where messageId=#{messageId}
+	</delete>
+
+</mapper>

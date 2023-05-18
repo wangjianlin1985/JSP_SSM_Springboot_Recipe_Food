@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.CookCollectMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加菜谱收藏记录 -->
+	<insert id="addCookCollect" parameterType="cookCollect">
+		insert into t_cookCollect(cookingObj,userObj,collectionTime) values 
+		(#{cookingObj.cookingId},#{userObj.user_name},#{collectionTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询菜谱收藏记录 -->
+	<select id="queryCookCollect" resultMap="cookCollectMap" >
+		select t_cookCollect.* from t_cookCollect,t_cooking,t_userInfo ${where} and t_cookCollect.cookingObj = t_cooking.cookingId and t_cookCollect.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="cookCollectMap" type="cookCollect">
+        <id property="collectId" column="collectId" />
+        <association property="cookingObj" column="cookingObj" select="com.chengxusheji.mapper.CookingMapper.getCooking" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有菜谱收藏记录 -->
+	<select id="queryCookCollectList" resultMap="cookCollectMap" >
+		select t_cookCollect.* from t_cookCollect,t_cooking,t_userInfo ${where} and t_cookCollect.cookingObj = t_cooking.cookingId and t_cookCollect.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的菜谱收藏记录数 -->
+	<select id="queryCookCollectCount" resultType="int">
+		select count(*) from t_cookCollect,t_cooking,t_userInfo ${where} and t_cookCollect.cookingObj = t_cooking.cookingId and t_cookCollect.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个菜谱收藏记录 -->
+	<select id="getCookCollect" parameterType="int" resultMap="cookCollectMap">
+		select * from t_cookCollect where t_cookCollect.collectId = #{collectId}
+	</select>
+
+	<!-- 更新菜谱收藏记录 -->
+	<update id="updateCookCollect" parameterType="cookCollect">
+		update t_cookCollect set cookingObj=#{cookingObj.cookingId},userObj=#{userObj.user_name},collectionTime=#{collectionTime} where collectId = #{collectId}
+	</update>
+
+	<!-- 删除菜谱收藏记录 -->
+	<delete id="deleteCookCollect" parameterType="int">
+		delete from t_cookCollect where collectId=#{collectId}
+	</delete>
+
+</mapper>
